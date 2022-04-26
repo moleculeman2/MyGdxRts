@@ -1,6 +1,5 @@
 package com.mygdx.game;
 
-import java.util.Iterator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
@@ -17,6 +16,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.systems.SysManager;
 import com.mygdx.game.templates.TestUnit;
+
+import java.util.Iterator;
 
 public class GameScreen implements Screen {
 	final Drop game;
@@ -148,7 +149,7 @@ public class GameScreen implements Screen {
 				iter.remove();
 			}
 		}
-	sysManager.moveSystem.updatePosition();
+	sysManager.moveSystem.updatePosition(delta);
 	}
 
 	@Override

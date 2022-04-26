@@ -2,11 +2,10 @@ package com.mygdx.game.systems;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Array.ArrayIterator;
-import com.mygdx.game.components.*;
 
 public class IdSystem {
 	
-	Array<Integer> IdList = new Array<Integer>(false, 10000);
+	Array<Integer> IdList = new Array<Integer>(false, 100000);
 	
 	public void addId(int id) {
 		this.IdList.add(id);

@@ -10,6 +10,15 @@ import com.mygdx.game.components.*;
 public class HpSystem {
 	
 	Array<Hp> hpList = new Array<Hp>(false, 10000);
+	Array<Armor> armorList = new Array<Armor>(false, 10000);
+
+	public void addHp(int id, short hp){
+		hpList.add(new Hp (id, hp));
+	}
+
+	public void addArmor(int id, short armor){
+		armorList.add(new Armor (id, armor));
+	}
 	//Hp[] hpList = array.begin();
 	//List<Hp> hpList = new ArrayList<Hp>();
 	

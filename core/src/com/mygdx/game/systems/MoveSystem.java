@@ -1,13 +1,12 @@
 package com.mygdx.game.systems;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Array.ArrayIterator;
+import com.mygdx.game.components.BoundingBox;
 import com.mygdx.game.components.Destination;
 import com.mygdx.game.components.MoveSpeed;
 import com.mygdx.game.components.Position;
-import com.mygdx.game.components.BoundingBox;
 
 public class MoveSystem {
 
@@ -37,7 +36,8 @@ public class MoveSystem {
 	// loop through every destination, check for ID match
 	// if match, loop through movespeed for match, then move it.
 	// also update bounding box
-	public void updatePosition() {
+	/**
+	public void updatePosition(float delta) {
 		for (ArrayIterator<Position> iter = positionList.iterator(); iter.hasNext(); ) {
 			Position p = iter.next();
 			int id = p.getId();
@@ -47,7 +47,7 @@ public class MoveSystem {
 					for (ArrayIterator<MoveSpeed> iter3 = moveSpeedList.iterator(); iter.hasNext(); ) {
 						MoveSpeed m = iter3.next();
 						if  (m.getId() == id) {
-							p.modifyPosition(d.getDestination()); //still need movespeed scalar
+							p.modifyPosition(d.getDestination(), delta); //still need movespeed scalar
 							for (ArrayIterator<BoundingBox> iter4 = boundingBoxList.iterator(); iter.hasNext(); ) {
 								BoundingBox b = iter4.next();
 								if (b.getId() == id) {
@@ -59,6 +59,12 @@ public class MoveSystem {
 				}
 			}
 			
+		}
+	 **/
+	public void updatePosition(float delta) {
+		for (ArrayIterator<Position> iter = positionList.iterator(); iter.hasNext(); ) {
+			Position p = iter.next();
+			int id = p.getId();
 		}
 	}
 	
