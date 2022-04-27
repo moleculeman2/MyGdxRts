@@ -1,6 +1,7 @@
 package com.mygdx.game.components;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 public class BoundingBox {
 	int id;
@@ -23,7 +24,7 @@ public class BoundingBox {
 		return id;
 	}
 	
-	public void setCenter(Position p) {
-		this.boundingBox.setCenter(p.getPosition().x, p.getPosition().y);
+	public void setCenter(Vector2 p) {
+		this.boundingBox.setCenter(p.x, p.y);
 	}
 }

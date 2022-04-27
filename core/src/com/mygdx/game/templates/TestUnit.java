@@ -2,7 +2,9 @@ package com.mygdx.game.templates;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.components.BoundingBox;
 import com.mygdx.game.components.Position;
 import com.mygdx.game.systems.SysManager;
 
@@ -17,7 +19,7 @@ public class TestUnit {
 	static int sight = 9;
 	static float atkSpeed = 1;
 	static String[] type = new String[]{"unit", "biological", "light"};
-	static Texture sprite = new Texture(Gdx.files.internal("unit.png")); // info and location for sprite in texture atlas
+	static Texture baseSprite = new Texture(Gdx.files.internal("unit.png")); // info and location for sprite in texture atlas
 	static float width = 50;
 	static float height = 50;
 
@@ -29,11 +31,8 @@ public class TestUnit {
 		int id = sysManager.addId();
 		sysManager.addHp(id, hp);
 		sysManager.addSelectable(id, true);
-		sysManager.addMoveSpeed(id, moveSpeed);
-		Position p1 = sysManager.addPosition(id, p, true);
-		sysManager.addDestination(id, d);
-		sysManager.addBoundingBox(id, p.x, p.y, width, height);
-		sysManager.addSprite(id, sprite); //eventually, this would be the coordinates in atlas
+		BoundingBox box = new BoundingBox(id, new Rectangle(p.x, p.y, width, height));
+		Position p1 = sysManager.addPosition(id, p, d, moveSpeed, box, baseSprite,true);
 		sysManager.addArmor(id, armor);
 		//sysManager.addDamage
 		//sysManager.addOwner

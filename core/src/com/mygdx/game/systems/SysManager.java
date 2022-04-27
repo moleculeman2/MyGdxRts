@@ -1,18 +1,17 @@
 package com.mygdx.game.systems;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.mygdx.game.components.*;
+import com.mygdx.game.components.BoundingBox;
+import com.mygdx.game.components.MoveSpeed;
+import com.mygdx.game.components.Position;
+import com.mygdx.game.components.Selectable;
 
 public class SysManager {
 	public HpSystem hpSystem = new HpSystem();
 	public IdSystem idSystem = new IdSystem();
 	public MoveSystem moveSystem = new MoveSystem();
 	public SelectSystem selectSystem = new SelectSystem();
-	public Array<BoundingBox> boundingBoxList = new Array<BoundingBox>(false, 10000);
-	public Array<Sprite> spriteList = new Array<Sprite>(false, 10000);
 	int idCounter = 0;
 	
 	public SysManager() {
@@ -40,30 +39,18 @@ public class SysManager {
 		moveSystem.moveSpeedList.add(new MoveSpeed(id, moveSpeed));
 	}
 
-	public Position addPosition(int id, Vector2 p, boolean b) {
+	public Position addPosition(int id, Vector2 p, Vector2 d, float ms, BoundingBox box, Texture sprite, boolean b) {
+
 		if (b == true) {
-			Position temp = new Position(id, p);
+			Position temp = new Position(id, p, d, ms, box, sprite);
 			moveSystem.positionList.add(temp);
 			return temp;
 		}
 		else{
-			moveSystem.positionList.add(new Position(id, p));
+			moveSystem.positionList.add(new Position(id, p, d, ms, box, sprite));
 			return null;
 		}
 
 	}
-	
-	public void addDestination(int id, Vector2 d) {
-		moveSystem.destinationList.add(new Destination(id, d));	
-	}
-
-	public void addBoundingBox(int id, float x, float y, float width, float height) {
-		boundingBoxList.add(new BoundingBox(id, new Rectangle(x,y,width,height)));
-	}
-
-	public void addSprite(int id, Texture newSprite) {
-		spriteList.add(new Sprite(id, newSprite));
-	}
-
 
 }
