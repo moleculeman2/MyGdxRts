@@ -1,15 +1,18 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.components.Position;
@@ -23,11 +26,14 @@ public class TestScreen implements Screen {
 	Music rainMusic;
 	OrthographicCamera camera;
 	OrthographicCamera hudCamera;
-	Rectangle bucket;
 	Array<Rectangle> raindrops;
 	Lwjgl3ApplicationConfiguration config;
+	MyInputProcessor inputProcessor;
+	Vector3 clickedPos = new Vector3(0,0,0);
+	Vector3 currentPos = new Vector3(0,0,0);
+	boolean clicked;
+	Rectangle selectBox = new Rectangle();
 
-	
 	SysManager sysManager;
 	Vector2 p = new Vector2(200,200);
 	Vector2 d = new Vector2(800,800);
@@ -35,6 +41,8 @@ public class TestScreen implements Screen {
 	public TestScreen(final ScreenManager game, Lwjgl3ApplicationConfiguration config) {
 		this.game = game;
 		this.config = config;
+		inputProcessor = new MyInputProcessor();
+		Gdx.input.setInputProcessor(inputProcessor);
 		//config.resizable = false;
 		//Gdx.graphics.setUndecorated(true);
 		sysManager  = new SysManager();
@@ -59,8 +67,6 @@ public class TestScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		ScreenUtils.clear(0, 0, 0.2f, 1);
-		
-		
 
 		// tell the camera to update its matrices.
 		camera.update();
@@ -72,13 +78,64 @@ public class TestScreen implements Screen {
 		game.batch.setProjectionMatrix(hudCamera.combined);
 		// begin a new batch and draw the bucket and all drops
 
-		
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
-			game.pause();
-			game.setScreen(new MainMenuScreen(game, config));
+
+		}
+		if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+
+		}
+		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+
 		}
 
+		Gdx.input.setInputProcessor(new MyInputProcessor() {
+			@Override public boolean keyDown (int keycode) {
+				switch (keycode) {
 
+				}
+				return false;
+			}
+			@Override public boolean keyUp (int keycode) {
+				switch (keycode) {
+					case Keys.ESCAPE: {
+						game.pause();
+						game.setScreen(new MainMenuScreen(game, config));
+						break;
+					}
+
+				}
+				return false;
+			}
+			@Override
+			public boolean touchDown (int x, int y, int pointer, int button) {
+				switch (button) {
+					case Input.Buttons.LEFT:{
+						clicked = true;
+						camera.unproject(clickedPos.set(Gdx.input.getX(),Gdx.input.getY(),0));
+						//clickedPos.set(x,y,0);
+						break;
+					}
+				}
+				return false;
+			}
+			@Override
+			public boolean touchUp (int x, int y, int pointer, int button) {
+				switch (button) {
+					case Input.Buttons.LEFT:{
+						clicked = false;
+						break;
+					}
+				}
+				return false;
+			}
+		});
+		if (clicked == true){
+			camera.unproject(currentPos.set(Gdx.input.getX(),Gdx.input.getY(),0));
+			DebugUtils.DrawDebugLine(clickedPos.x, clickedPos.y, clickedPos.x, currentPos.y, 3 , Color.GREEN, camera.combined);
+			DebugUtils.DrawDebugLine(clickedPos.x, clickedPos.y, currentPos.x, clickedPos.y, 3 , Color.GREEN, camera.combined);
+			DebugUtils.DrawDebugLine(currentPos.x, currentPos.y, clickedPos.x, currentPos.y, 3 , Color.GREEN, camera.combined);
+			DebugUtils.DrawDebugLine(currentPos.x, currentPos.y, currentPos.x, clickedPos.y, 3 , Color.GREEN, camera.combined);
+		}
 
 		sysManager.moveSystem.updatePosition(delta);
 		game.batch.begin();
