@@ -44,7 +44,7 @@ public class Position {
 		mod.set(destination);
 		mod.sub(position).nor();
 		if (position.dst2(destination) > moveSpeed){
-			this.position.mulAdd(mod, (delta*moveSpeed));
+			this.position.mulAdd(mod, (delta*moveSpeed*75));
 		}else{
 			this.destination = null;
 		}
