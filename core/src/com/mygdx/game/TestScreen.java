@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ai.pfa.Connection;
+import com.badlogic.gdx.ai.pfa.Graph;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
@@ -15,9 +17,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.mygdx.game.components.BoundingBox;
 import com.mygdx.game.components.Position;
 import com.mygdx.game.systems.SysManager;
 import com.mygdx.game.templates.TestUnit;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
 
 public class TestScreen implements Screen {
 	final ScreenManager game;
@@ -32,11 +38,16 @@ public class TestScreen implements Screen {
 	Vector3 clickedPos = new Vector3(0,0,0);
 	Vector3 currentPos = new Vector3(0,0,0);
 	boolean clicked;
+	boolean shiftMod;
 	Rectangle selectBox = new Rectangle();
+	Array<Position> hoveredList = new Array<Position>(false, 100);
+	Array<Position> selectedList = new Array<Position>(false, 100);
 
 	SysManager sysManager;
 	Vector2 p = new Vector2(200,200);
 	Vector2 d = new Vector2(800,800);
+	Vector2 center;
+	Vector2 center2;
 
 	public TestScreen(final ScreenManager game, Lwjgl3ApplicationConfiguration config) {
 		this.game = game;
@@ -61,12 +72,14 @@ public class TestScreen implements Screen {
 		hudCamera.position.set(hudCamera.viewportWidth / 2.0f, hudCamera.viewportHeight / 2.0f, 1.0f);
 
 		TestUnit.createUnit(sysManager, p, d, 0); //Needs all the lists of components from ListSystem. Needs location/rally and which player from creator.
-
+		TestUnit.createUnit(sysManager, new Vector2(200,200), new Vector2(100, 1000), 0);
 	}
 
 	@Override
 	public void render(float delta) {
+
 		ScreenUtils.clear(0, 0, 0.2f, 1);
+		inputProcessorInit();
 
 		// tell the camera to update its matrices.
 		camera.update();
@@ -76,27 +89,82 @@ public class TestScreen implements Screen {
 		// coordinate system specified by the camera.
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.setProjectionMatrix(hudCamera.combined);
-		// begin a new batch and draw the bucket and all drops
 
-		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
+		sysManager.moveSystem.updatePosition(delta);
+		game.batch.begin();
+		game.font.draw(game.batch, "Upper left, FPS=" + Gdx.graphics.getFramesPerSecond(), 0, hudCamera.viewportHeight);
+		game.font.draw(game.batch, "Upper left,  real FPS=" + Math.round(1/Gdx.graphics.getDeltaTime()), 500, hudCamera.viewportHeight);
+		game.font.draw(game.batch, "Lower left", 0, game.font.getLineHeight());
+		//for my game, I would loop through all rectangle components and get its ID
+		//Then, lookup that ID in the "sprites" component list, and draw it at rectangle
 
+		//If new units hovered and released on, clears the old selected units
+		if (hoveredList.notEmpty() && !clicked){
+			selectedList.clear();
 		}
-		if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+		for (Position p : sysManager.moveSystem.getPositionList()){
+			if (p.getDestination() == null && p.getMoveQueue().notEmpty()){
+				p.setDestination(p.getMoveQueue().removeFirst());
+			}
+			if (!(selectBox.overlaps(p.getBox().getBoundingBox()))){ //remove units that passed outside select box
+				hoveredList.removeValue(p, true);
+			}
+			if (clicked && p.getPlayer() == 0 && selectBox.overlaps(p.getBox().getBoundingBox())){ //highlight player units in selectbox
+				if (!(hoveredList.contains(p, true))){hoveredList.add(p);}
+				game.batch.setColor(0.6F, 0.9F,0.6F, 1);
+				game.batch.draw(p.getSprite(), p.getBox().getBoundingBox().getX(), p.getBox().getBoundingBox().getY());
+			}
+			else if (!clicked && hoveredList.contains(p, true)){ //if click release, remove add to selected and remove from hover
+				selectedList.add(p);
+				hoveredList.removeValue(p, true);
+			}
+			else if(selectedList.contains(p, true)){ // if selected, draw as green
+				game.batch.setColor(0, 1,0, 1);
+				game.batch.draw(p.getSprite(), p.getBox().getBoundingBox().getX(), p.getBox().getBoundingBox().getY());
+			}
+			else { //render everything else normally
+				game.batch.setColor(1, 1,1,1);
+				game.batch.draw(p.getSprite(), p.getBox().getBoundingBox().getX(), p.getBox().getBoundingBox().getY());
+			}
 
+
+
+			game.font.draw(game.batch, "Pos", p.getPosition().x, p.getPosition().y);
+			if (p.getDestination() != null){
+				game.font.draw(game.batch, "Des", p.getDestination().x, p.getDestination().y);
+			}
 		}
-		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+		game.batch.end();
 
+		if (clicked){
+			camera.unproject(currentPos.set(Gdx.input.getX(),Gdx.input.getY(),0));
+			DebugUtils.DrawDebugLine(clickedPos.x, clickedPos.y, clickedPos.x, currentPos.y, 3 , Color.GREEN, camera.combined);
+			DebugUtils.DrawDebugLine(clickedPos.x, clickedPos.y, currentPos.x, clickedPos.y, 3 , Color.GREEN, camera.combined);
+			DebugUtils.DrawDebugLine(currentPos.x, currentPos.y, clickedPos.x, currentPos.y, 3 , Color.GREEN, camera.combined);
+			DebugUtils.DrawDebugLine(currentPos.x, currentPos.y, currentPos.x, clickedPos.y, 3 , Color.GREEN, camera.combined);
 		}
 
+		if (!clicked) { selectBox.set(0,0,0,0);}
+	}
+
+	private void inputProcessorInit() {
+		if (clicked) { selectBox.set(min(clickedPos.x, currentPos.x), min(clickedPos.y, currentPos.y),
+				abs(clickedPos.x - currentPos.x), abs(clickedPos.y - currentPos.y));}
 		Gdx.input.setInputProcessor(new MyInputProcessor() {
 			@Override public boolean keyDown (int keycode) {
 				switch (keycode) {
-
+					case Keys.SHIFT_LEFT: {
+						shiftMod = true;
+					}
 				}
 				return false;
 			}
 			@Override public boolean keyUp (int keycode) {
 				switch (keycode) {
+					case Keys.SHIFT_LEFT: {
+						shiftMod = false;
+						break;
+					}
 					case Keys.ESCAPE: {
 						game.pause();
 						game.setScreen(new MainMenuScreen(game, config));
@@ -112,7 +180,24 @@ public class TestScreen implements Screen {
 					case Input.Buttons.LEFT:{
 						clicked = true;
 						camera.unproject(clickedPos.set(Gdx.input.getX(),Gdx.input.getY(),0));
-						//clickedPos.set(x,y,0);
+						camera.unproject(currentPos.set(Gdx.input.getX(),Gdx.input.getY(),0));
+						selectBox.set(min(clickedPos.x, currentPos.x), min(clickedPos.y, currentPos.y),
+								abs(clickedPos.x - currentPos.x), abs(clickedPos.y - currentPos.y));
+						break;
+					}
+					case Input.Buttons.RIGHT:{
+						camera.unproject(clickedPos.set(Gdx.input.getX(),Gdx.input.getY(),0));
+						for (Position p : selectedList){
+							if (shiftMod){
+								p.getMoveQueue().addLast(new Vector2(clickedPos.x,clickedPos.y));
+							}
+							else{
+								p.getMoveQueue().clear();
+								p.setDestination(new Vector2(clickedPos.x,clickedPos.y));
+							}
+
+							//
+						}
 						break;
 					}
 				}
@@ -129,32 +214,6 @@ public class TestScreen implements Screen {
 				return false;
 			}
 		});
-		if (clicked == true){
-			camera.unproject(currentPos.set(Gdx.input.getX(),Gdx.input.getY(),0));
-			DebugUtils.DrawDebugLine(clickedPos.x, clickedPos.y, clickedPos.x, currentPos.y, 3 , Color.GREEN, camera.combined);
-			DebugUtils.DrawDebugLine(clickedPos.x, clickedPos.y, currentPos.x, clickedPos.y, 3 , Color.GREEN, camera.combined);
-			DebugUtils.DrawDebugLine(currentPos.x, currentPos.y, clickedPos.x, currentPos.y, 3 , Color.GREEN, camera.combined);
-			DebugUtils.DrawDebugLine(currentPos.x, currentPos.y, currentPos.x, clickedPos.y, 3 , Color.GREEN, camera.combined);
-		}
-
-		sysManager.moveSystem.updatePosition(delta);
-		game.batch.begin();
-		game.font.draw(game.batch, "Upper left, FPS=" + Gdx.graphics.getFramesPerSecond(), 0, hudCamera.viewportHeight);
-		game.font.draw(game.batch, "Upper left,  real FPS=" + Math.round(1/Gdx.graphics.getDeltaTime()), 500, hudCamera.viewportHeight);
-		game.font.draw(game.batch, "Lower left", 0, game.font.getLineHeight());
-		//for my game, I would loop through all rectangle components and get its ID
-		//Then, lookup that ID in the "sprites" component list, and draw it at rectangle
-		for (Position p : sysManager.moveSystem.getPositionList()){
-			game.batch.draw(p.getSprite(), p.getPosition().x, p.getPosition().y);
-			game.font.draw(game.batch, "Pos", p.getPosition().x, p.getPosition().y);
-			if (p.getDestination() != null){
-				game.font.draw(game.batch, "Des", p.getDestination().x, p.getDestination().y);
-			}
-		}
-
-		//for (Rectangle raindrop : raindrops) {
-		//game.batch.draw(dropImage, raindrop.x, raindrop.y); }
-		game.batch.end();
 	}
 
 	@Override

@@ -18,6 +18,12 @@ public class MoveQueue {
 		return moveQueue;
 	}
 
+	public Point popQueue(){
+		Point first = moveQueue.first();
+		moveQueue.removeFirst();
+		return first;
+	}
+
 	public void setMoveQueue(Queue<Point> moveQueue) {
 		this.moveQueue = moveQueue;
 	}

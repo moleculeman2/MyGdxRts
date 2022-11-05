@@ -25,9 +25,8 @@ public class DesktopLauncher {
 		//new LwjglApplication(new Drop(), config);
 		 **/
 		config.setTitle("RTS prototype");
-
 		config.setDecorated(false);
-		config.setForegroundFPS(0);
+		config.setForegroundFPS(144);
 		config.useVsync(false);
 		config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
 		config.setAutoIconify(true);

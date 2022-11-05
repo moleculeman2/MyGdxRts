@@ -20,8 +20,8 @@ public class TestUnit {
 	static float atkSpeed = 1;
 	static String[] type = new String[]{"unit", "biological", "light"};
 	static Texture baseSprite = new Texture(Gdx.files.internal("unit.png")); // info and location for sprite in texture atlas
-	static float width = 50;
-	static float height = 50;
+	static float width = baseSprite.getWidth();
+	static float height = baseSprite.getHeight();
 
 	public TestUnit(){
 		//probably don't need this. I thought I was making a new test unit, but really this is
@@ -32,7 +32,7 @@ public class TestUnit {
 		sysManager.addHp(id, hp);
 		sysManager.addSelectable(id, true);
 		BoundingBox box = new BoundingBox(id, new Rectangle(p.x, p.y, width, height));
-		Position p1 = sysManager.addPosition(id, p, d, moveSpeed, box, baseSprite,true);
+		Position p1 = sysManager.addPosition(id, p, d, moveSpeed, box, baseSprite,true, player);
 		sysManager.addArmor(id, armor);
 		//sysManager.addDamage
 		//sysManager.addOwner

@@ -11,7 +11,10 @@ public class MoveSystem {
 	Array<Position> positionList = new Array<Position>(false, 10000);
 	// an array with a list of coordinates in the texture atlas, for each object w/ a sprite?
 	//      or, an array that stores id and texture object?
-	
+
+	/**
+	 *  this is for changing base movespeed values
+	 */
 	public void updateMoveSpeed() {
 		for (ArrayIterator<Position> iter = positionList.iterator(); iter.hasNext(); ) {
 			Position p = iter.next();
@@ -19,7 +22,11 @@ public class MoveSystem {
 			//will need methods both for scaling percentage movespeed and setting to flat amounts
 		}
 	}
-	
+
+	/** this is for teleporting units to a new point
+	 * @param id ID of the unit
+	 * @param d Destination vector
+	 */
 	public void updateDestination(int id, Vector2 d) {
 		for (ArrayIterator<Position> iter = positionList.iterator(); iter.hasNext(); ) {
 			Position p = iter.next();
@@ -29,6 +36,9 @@ public class MoveSystem {
 		}
 	}
 
+	/** this is for moving a unit by walking/flying
+	 * @param delta
+	 */
 	public void updatePosition(float delta) {
 		for (ArrayIterator<Position> iter = positionList.iterator(); iter.hasNext(); ) {
 			Position p = iter.next();

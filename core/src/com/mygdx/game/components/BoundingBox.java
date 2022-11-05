@@ -20,6 +20,11 @@ public class BoundingBox {
 		this.boundingBox = boundingBox;
 	}
 
+	public Vector2 getCenter() {
+		Vector2 center = new Vector2(boundingBox.getX() + (boundingBox.getWidth()/2), boundingBox.getY() + (boundingBox.getHeight()/2));
+		return center;
+	}
+
 	public int getId() {
 		return id;
 	}

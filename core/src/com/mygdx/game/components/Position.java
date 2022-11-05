@@ -14,8 +14,18 @@ public class Position {
 	float moveSpeed;
 	Queue<Vector2> moveQueue;
 
+	public int getPlayer() {
+		return player;
+	}
+
+	public void setPlayer(int player) {
+		this.player = player;
+	}
+
+	int player;
+
 	
-	public Position(int id, Vector2 position, Vector2 destination, float moveSpeed, BoundingBox box, Texture sprite) {
+	public Position(int id, Vector2 position, Vector2 destination, float moveSpeed, BoundingBox box, Texture sprite, int player) {
 		//super(); do I need this?
 		this.id = id;
 		this.position = position;
@@ -23,8 +33,8 @@ public class Position {
 		this.moveSpeed = moveSpeed;
 		this.box = box;
 		this.sprite = sprite;
-
-		//this.moveQueue = moveQueue;
+		this.player = player;
+		this.moveQueue = new Queue<Vector2>();
 	}
 	
 	public int getId() {
@@ -39,6 +49,9 @@ public class Position {
 		this.position = position;
 	}
 
+	/**
+	 * @param delta system param for time passed since last frame
+	 */
 	public void modifyPosition(float delta) {
 		Vector2 mod = new Vector2();
 		mod.set(destination);
@@ -46,13 +59,23 @@ public class Position {
 		if (position.dst2(destination) > moveSpeed){
 			this.position.mulAdd(mod, (delta*moveSpeed*75));
 		}else{
-			this.destination = null;
+			if (moveQueue.notEmpty()){
+				this.destination = moveQueue.removeFirst();
+			}
+			else{
+				this.destination = null;
+			}
+
 		}
 		updateComponents();
 	}
 
 	private void updateComponents(){
-		box.setCenter(position);
+		this.box.setCenter(position);
+		//float x = box.getBoundingBox().getWidth() / 2;
+		//float y = box.getBoundingBox().getHeight() / 2;
+		//this.box.getBoundingBox().setCenter( position.x - x, position.y - y);
+		//box.getBoundingBox().setPosition(position);
 	}
 
 	public BoundingBox getBox() {

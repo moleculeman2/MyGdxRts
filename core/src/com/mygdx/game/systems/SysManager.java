@@ -39,15 +39,15 @@ public class SysManager {
 		moveSystem.moveSpeedList.add(new MoveSpeed(id, moveSpeed));
 	}
 
-	public Position addPosition(int id, Vector2 p, Vector2 d, float ms, BoundingBox box, Texture sprite, boolean b) {
+	public Position addPosition(int id, Vector2 p, Vector2 d, float ms, BoundingBox box, Texture sprite, boolean b, int player) {
 
-		if (b == true) {
-			Position temp = new Position(id, p, d, ms, box, sprite);
+		if (b) {
+			Position temp = new Position(id, p, d, ms, box, sprite, player);
 			moveSystem.positionList.add(temp);
 			return temp;
 		}
 		else{
-			moveSystem.positionList.add(new Position(id, p, d, ms, box, sprite));
+			moveSystem.positionList.add(new Position(id, p, d, ms, box, sprite, player));
 			return null;
 		}
 
