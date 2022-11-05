@@ -13,6 +13,7 @@ public class Position {
 	Texture sprite;
 	float moveSpeed;
 	Queue<Vector2> moveQueue;
+	boolean pathTest;
 
 	public int getPlayer() {
 		return player;
@@ -25,7 +26,7 @@ public class Position {
 	int player;
 
 	
-	public Position(int id, Vector2 position, Vector2 destination, float moveSpeed, BoundingBox box, Texture sprite, int player) {
+	public Position(int id, Vector2 position, Vector2 destination, float moveSpeed, BoundingBox box, Texture sprite, int player, boolean pathTest) {
 		//super(); do I need this?
 		this.id = id;
 		this.position = position;
@@ -35,6 +36,7 @@ public class Position {
 		this.sprite = sprite;
 		this.player = player;
 		this.moveQueue = new Queue<Vector2>();
+		this.pathTest = pathTest;
 	}
 	
 	public int getId() {

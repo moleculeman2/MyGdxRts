@@ -19,6 +19,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.components.BoundingBox;
 import com.mygdx.game.components.Position;
+import com.mygdx.game.rvo.Blocks;
+import com.mygdx.game.rvo.Simulator;
 import com.mygdx.game.systems.SysManager;
 import com.mygdx.game.templates.TestUnit;
 
@@ -32,7 +34,6 @@ public class TestScreen implements Screen {
 	Music rainMusic;
 	OrthographicCamera camera;
 	OrthographicCamera hudCamera;
-	Array<Rectangle> raindrops;
 	Lwjgl3ApplicationConfiguration config;
 	MyInputProcessor inputProcessor;
 	Vector3 clickedPos = new Vector3(0,0,0);
@@ -48,6 +49,8 @@ public class TestScreen implements Screen {
 	Vector2 d = new Vector2(800,800);
 	Vector2 center;
 	Vector2 center2;
+
+	final Blocks blocks = new Blocks();
 
 	public TestScreen(final ScreenManager game, Lwjgl3ApplicationConfiguration config) {
 		this.game = game;
@@ -73,11 +76,20 @@ public class TestScreen implements Screen {
 
 		TestUnit.createUnit(sysManager, p, d, 0); //Needs all the lists of components from ListSystem. Needs location/rally and which player from creator.
 		TestUnit.createUnit(sysManager, new Vector2(200,200), new Vector2(100, 1000), 0);
+
+		// Set up the scenario.
+		blocks.setupScenario();
+
 	}
 
 	@Override
 	public void render(float delta) {
 
+		if (!blocks.reachedGoal()){
+			Blocks.updateVisualization();
+			blocks.setPreferredVelocities();
+			Simulator.instance.doStep();
+		}
 		ScreenUtils.clear(0, 0, 0.2f, 1);
 		inputProcessorInit();
 
