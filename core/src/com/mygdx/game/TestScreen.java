@@ -78,7 +78,7 @@ public class TestScreen implements Screen {
 		TestUnit.createUnit(sysManager, new Vector2(200,200), new Vector2(100, 1000), 0);
 
 		// Set up the scenario.
-		blocks.setupScenario();
+		blocks.setupScenario(sysManager);
 
 	}
 
@@ -124,7 +124,8 @@ public class TestScreen implements Screen {
 			if (clicked && p.getPlayer() == 0 && selectBox.overlaps(p.getBox().getBoundingBox())){ //highlight player units in selectbox
 				if (!(hoveredList.contains(p, true))){hoveredList.add(p);}
 				game.batch.setColor(0.6F, 0.9F,0.6F, 1);
-				game.batch.draw(p.getSprite(), p.getBox().getBoundingBox().getX(), p.getBox().getBoundingBox().getY());
+				game.batch.draw(p.getSprite(), p.getBox().getBoundingBox().getX(), p.getBox().getBoundingBox().getY(),
+						p.getBox().getBoundingBox().height, p.getBox().getBoundingBox().width);
 			}
 			else if (!clicked && hoveredList.contains(p, true)){ //if click release, remove add to selected and remove from hover
 				selectedList.add(p);
@@ -132,18 +133,18 @@ public class TestScreen implements Screen {
 			}
 			else if(selectedList.contains(p, true)){ // if selected, draw as green
 				game.batch.setColor(0, 1,0, 1);
-				game.batch.draw(p.getSprite(), p.getBox().getBoundingBox().getX(), p.getBox().getBoundingBox().getY());
+				game.batch.draw(p.getSprite(), p.getBox().getBoundingBox().getX(), p.getBox().getBoundingBox().getY(),
+						p.getBox().getBoundingBox().height, p.getBox().getBoundingBox().width);
 			}
 			else { //render everything else normally
 				game.batch.setColor(1, 1,1,1);
-				game.batch.draw(p.getSprite(), p.getBox().getBoundingBox().getX(), p.getBox().getBoundingBox().getY());
+				game.batch.draw(p.getSprite(), p.getBox().getBoundingBox().getX(), p.getBox().getBoundingBox().getY(),
+						p.getBox().getBoundingBox().height, p.getBox().getBoundingBox().width);
 			}
 
-
-
-			game.font.draw(game.batch, "Pos", p.getPosition().x, p.getPosition().y);
+			//game.font.draw(game.batch, "pos", p.getPosition().x, p.getPosition().y);
 			if (p.getDestination() != null){
-				game.font.draw(game.batch, "Des", p.getDestination().x, p.getDestination().y);
+				game.font.draw(game.batch, "des", p.getDestination().x, p.getDestination().y);
 			}
 		}
 		game.batch.end();

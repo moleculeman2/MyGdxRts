@@ -8,8 +8,8 @@ import com.mygdx.game.components.BoundingBox;
 import com.mygdx.game.components.Position;
 import com.mygdx.game.systems.SysManager;
 
-public class TestUnit {
-	
+public class TestUnit2 {
+
 	//this stuff below is like the blueprint of the unit
 	//these values are only used to pass to the individuals components.
 	static short hp = 50;
@@ -22,14 +22,14 @@ public class TestUnit {
 	static Texture baseSprite = new Texture(Gdx.files.internal("unit.png")); // info and location for sprite in texture atlas
 	//static float width = baseSprite.getWidth();
 	//static float height = baseSprite.getHeight();
-	static float width = 50;
-	static float height = 50;
+	static float width = 5;
+	static float height = 5;
 
-	public TestUnit(){
+	public TestUnit2(){
 		//probably don't need this. I thought I was making a new test unit, but really this is
 		//just a blueprint, and the unit is made by the components. nothing is saved here.
 	}
-	public static void createUnit(SysManager sysManager, Vector2 p, Vector2 d, int player){
+	public static int createUnit(SysManager sysManager, Vector2 p, Vector2 d, int player){
 		int id = sysManager.addId();
 		sysManager.addHp(id, hp);
 		sysManager.addSelectable(id, true);
@@ -38,5 +38,6 @@ public class TestUnit {
 		sysManager.addArmor(id, armor);
 		//sysManager.addDamage
 		//sysManager.addOwner
+		return id;
 	}
 }

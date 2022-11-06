@@ -1,11 +1,16 @@
 package com.mygdx.game.rvo;
 
+import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.components.Position;
+import com.mygdx.game.systems.SysManager;
+import com.mygdx.game.templates.TestUnit2;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.commons.math3.util.FastMath;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import com.mygdx.game.rvo.Simulator;
 
 // Example showing a demo with 100 agents split in four groups initially
 // positioned in four corners of the environment. Each agent attempts to move to
@@ -18,7 +23,7 @@ public class Blocks {
     // Random number generator.
     private final Random random = new Random();
 
-    public void setupScenario() {
+    public void setupScenario(SysManager sysManager) {
         // Specify the global time step of the simulation.
         Simulator.instance.setTimeStep(0.25);
 
@@ -31,9 +36,11 @@ public class Blocks {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 Simulator.instance.addAgent(new Vector2D(1000.0 + i * 10.0, 50.0 + j * 10.0));
+                TestUnit2.createUnit(sysManager, new Vector2((float) (1000.0 + i * 10.0), (float) (50.0 + j * 10.0)), null, 1);
                 goals.add(new Vector2D(50.0, 1000.0));
 
                 Simulator.instance.addAgent(new Vector2D(50.0 + i * 10.0, 50.0 + j * 10.0));
+
                 goals.add(new Vector2D(1000.0, 1000.0));
 
                 Simulator.instance.addAgent(new Vector2D(1000.0 + i * 10.0, 1000.0 + j * 10.0));
@@ -76,6 +83,7 @@ public class Blocks {
 
         // Process the obstacles so that they are accounted for in the
         // simulation.
+        System.out.println(Simulator.instance.getNumObstacleVertices());
         Simulator.instance.processObstacles();
     }
 
